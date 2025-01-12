@@ -1,0 +1,30 @@
+{
+	"storyName": "",
+	"difficulties": "",
+	"hideFreeplay": false,
+	"weekBackground": "",
+	"weekBefore": "tutorial",
+	"freeplayColor": [
+		146,
+		113,
+		253
+	],
+	"startUnlocked": true,
+	"hideStoryMode": true,
+	"songs": [
+		["amogus", "bf", [79,164,184]],
+		["opposition", "bf", [79,164,184]],
+		["purgation", "bf", [79,164,184]],
+		["rainbow", "bf", [79,164,184]],
+		["supernovae", "bf", [79,164,184]],
+		["tutorial", "bf", [79,164,184]],
+		["eclipse-dylan-part", "bf", [79,164,184]]
+	],
+	"weekCharacters": [
+		"dad",
+		"bf",
+		"gf"
+	],
+	"hiddenUntilUnlocked": false,
+	"weekName": "Challenge"
+}
