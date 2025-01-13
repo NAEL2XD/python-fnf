@@ -300,7 +300,7 @@ def play(jsonFile):
 
         if timeNow > (240/bpm)*curSection:
             curSection += 1
-            zoomForce = 60
+            zoomForce = 90
 
         stxt = f'Score: {score} | Accuracy: {accuracyNew}' if not cpuControlled else 'BOT'
         sset = scoreTxt.render(stxt, True, (255, 255, 255))
@@ -313,7 +313,7 @@ def play(jsonFile):
         
         zoomed_screen = pygame.transform.smoothscale(screen, (1280+zoomForce, 720+(zoomForce/1.5)))
         screen.blit(zoomed_screen, (-(zoomForce/2), -(zoomForce/3.33)))
-        zoomForce = (zoomForce/1.05)
+        zoomForce = (zoomForce/1.075)
 
         FPS.tick()
         pygame.display.flip()

@@ -85,7 +85,7 @@ def main():
                 
         for i in range(len(textMaker)):
             for j in range(2):
-                stupit = textMaker[i][j].render((coolOptions[i][0] if j == 0 else str(save[i])), True, (127, 127, 127) if -i == choice else (255, 255, 255))
+                stupit = textMaker[i][j].render((coolOptions[i][0] if j == 0 else str(save[i])), True, (255, 255, 255) if -i == choice else (50, 50, 50))
                 screen.blit(stupit, ((350*(j+1)), 50+(60*i)))
                 if -i == choice:
                     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(40, 610, 1200, 90))

@@ -51,10 +51,7 @@ def main():
         screen.blit(menuBG, (0, 0))
 
         for i in range(len(options)):
-            if -i == optionsChosen:
-                piss = options[i][1].render(options[i][0], True, (127, 127, 127))
-            else:
-                piss = options[i][1].render(options[i][0], True, (255, 255, 255))
+            piss = options[i][1].render(options[i][0], True, (255, 255, 255) if -i == optionsChosen else (50, 50, 50))
             screen.blit(piss, (75, 120+(80*i)))
 
         FPS.tick()

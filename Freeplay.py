@@ -36,7 +36,6 @@ def main():
     currentPlaying = ""
     bpm = 0
     curBeat = 0
-    currentIcon = None
     beatPower = 0
     freeplay = True
     curSec = -time.time()
@@ -74,7 +73,6 @@ def main():
                     pygame.mixer.music.stop() 
                     pygame.mixer.music.load(f"assets/songs/{s}/Inst.ogg")
                     pygame.mixer.music.play()
-                    currentIcon = chosenSong
                     print(bpm)
                 if event.key == pygame.K_BACKSPACE:
                     import Main
@@ -88,18 +86,14 @@ def main():
 
         if not insideSong:
             screen.blit(menuBG, (0, 0))
+            beatPower = beatPower/1.2
             for i in range(len(freeplayText)):
-                if -i == chosenSong:
-                    hahaFunny = freeplayText[i][1].render(freeplayText[i][0], True, (255, 255, 255))
-                    beatPower = beatPower/1.2
-                else:
-                    hahaFunny = freeplayText[i][1].render(freeplayText[i][0], True, (127, 127, 127))
+                hahaFunny = freeplayText[i][1].render(freeplayText[i][0], True, (255, 255, 255) if -i == chosenSong else (50, 50, 50))
                 screen.blit(hahaFunny, (200+(25*(i+chosenSong)), 280+(100*(i+chosenSong))))
                 screen.blit(freeplayText[i][2], (50+(25*(i+chosenSong)), 275+(100*(i+chosenSong))), (0, 0, 150, 150))
 
         if not pygame.mixer.music.get_busy():
             currentPlaying = ""
-            currentIcon = None
             pygame.mixer.music.load("assets/music/freakyMenu.ogg")
             pygame.mixer.music.play()
 
