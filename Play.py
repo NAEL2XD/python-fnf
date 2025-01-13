@@ -103,6 +103,11 @@ def play(jsonFile):
     accuracyOld = 0
     accuracyNew = "???"
 
+    # Game Funnies
+    zoomForce = 0
+    curSection = 0
+    bpm = jsonFile['song']['bpm']
+
     # Saves Only
     save = open('assets/saves/save.txt', 'r')
     save = save.read()
@@ -118,8 +123,7 @@ def play(jsonFile):
     noMoreSpawn = False
     songTime = -time.time()
     ratingSpawn = []
-    songEnd = False
-    while not songEnd:
+    while True:
         screen.fill((0, 0, 0))
         timeNow = (songTime+time.time())
 
@@ -293,17 +297,24 @@ def play(jsonFile):
                         noteLoad -= 1
             except:
                 noteLoad -= 1
-        
+
+        if timeNow > (240/bpm)*curSection:
+            curSection += 1
+            zoomForce = 60
+
         stxt = f'Score: {score} | Accuracy: {accuracyNew}' if not cpuControlled else 'BOT'
         sset = scoreTxt.render(stxt, True, (255, 255, 255))
         screen.blit(sset, ((width/2)-((len(stxt)*12)/2),600))
 
         if not pygame.mixer.music.get_busy():
-            songEnd = True
+            import Freeplay
+            Freeplay.main()
+            return 0
+        
+        zoomed_screen = pygame.transform.smoothscale(screen, (1280+zoomForce, 720+(zoomForce/1.5)))
+        screen.blit(zoomed_screen, (-(zoomForce/2), -(zoomForce/3.33)))
+        zoomForce = (zoomForce/1.05)
 
         FPS.tick()
         pygame.display.flip()
         clock.tick(60)
-
-    import Freeplay
-    Freeplay.main()

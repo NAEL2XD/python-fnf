@@ -17,8 +17,7 @@ def main():
     ]
     optionsChosen = 0
 
-    insideMenu = True
-    while insideMenu:
+    while True:
         screen.fill("black")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -40,9 +39,10 @@ def main():
                     print(py)
                     if py == 0:
                         import Freeplay
+                        Freeplay.main()
                     elif py == 1:
                         import Settings
-                    insideMenu = False
+                        Settings.main()
             
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load("assets/music/freakyMenu.ogg")

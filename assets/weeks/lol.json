@@ -12,13 +12,7 @@
 	"startUnlocked": true,
 	"hideStoryMode": true,
 	"songs": [
-		["amogus", "bf", [79,164,184]],
-		["opposition", "bf", [79,164,184]],
-		["purgation", "bf", [79,164,184]],
-		["rainbow", "bf", [79,164,184]],
-		["supernovae", "bf", [79,164,184]],
-		["tutorial", "bf", [79,164,184]],
-		["eclipse-dylan-part", "bf", [79,164,184]]
+		["tutorial", "bf", [79,164,184]]
 	],
 	"weekCharacters": [
 		"dad",

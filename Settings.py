@@ -13,6 +13,7 @@ def main():
     save = open('assets/saves/save.txt', 'w+')
     save = save.read()
     save = save.splitlines()
+
     coolOptions = [
         [
             "Bot Mode",
@@ -23,6 +24,8 @@ def main():
     ]
     textMaker = []
     useSaveSettings = True
+    choice = 0
+
     for i in range(len(coolOptions)):
         textMaker.append([])
         try:
@@ -36,14 +39,16 @@ def main():
     if useSaveSettings:
         for i in range(len(coolOptions)):
             coolOptions[i][3] = save[i]
+
     desc = pygame.font.Font('assets/fonts/vcr.ttf', 30)
     menuBGMagenta = pygame.image.load('assets/image/menuBGMagenta.png')
     pygame.mixer.music.load('assets/music/settings.ogg')
     pygame.mixer.music.play(-1)
-    choice = 0
-    settinShit = True
-    while settinShit:
+
+    while True:
         screen.fill('black')
+        screen.blit(menuBGMagenta, (0, 0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -76,8 +81,8 @@ def main():
                     print("Save file created in assets/saves/save.txt")
                     pygame.mixer.music.stop()
                     import Main
-                    settinShit = False
-        screen.blit(menuBGMagenta, (0, 0))
+                    return 0
+                
         for i in range(len(textMaker)):
             for j in range(2):
                 stupit = textMaker[i][j].render((coolOptions[i][0] if j == 0 else str(save[i])), True, (127, 127, 127) if -i == choice else (255, 255, 255))
@@ -86,8 +91,7 @@ def main():
                     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(40, 610, 1200, 90))
                     cool = desc.render(coolOptions[i][2], True, (255, 255, 255))
                     screen.blit(cool, (640-(len(coolOptions[i][2])*10), 640))
+
         FPS.tick()
         pygame.display.flip()
         clock.tick(60)
-
-main()

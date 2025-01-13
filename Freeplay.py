@@ -1,10 +1,10 @@
 import pygame
 import ctypes
-import Play
 import glob
 import json
 import os.path
 import FPS
+import time
 
 def popup(title, text, style=0):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
@@ -18,6 +18,7 @@ def main():
     screen = pygame.display.set_mode((1280,720))
     clock = pygame.time.Clock()
     menuBG = pygame.image.load('assets/image/menuBG.png')
+
     jsons = glob.glob("assets/weeks/*.json")
     freeplayText = []
     for i in range(len(jsons)):
@@ -29,11 +30,16 @@ def main():
             if os.path.exists(f"assets/image/icons/icon-{read['songs'][j][1]}.png"):
                 iconName = read['songs'][j][1]
             freeplayText.append([read['songs'][j][0], pygame.font.Font("assets/fonts/vcr.ttf", 90), pygame.image.load(f'assets/image/icons/icon-{iconName}.png')])
+
     chosenSong = 0
     insideSong = False
     currentPlaying = ""
-    bpm = 0 # UNUSED but meh
+    bpm = 0
+    curBeat = 0
+    currentIcon = None
+    beatPower = 0
     freeplay = True
+    curSec = -time.time()
     while freeplay:
         screen.fill("black")
         for event in pygame.event.get():
@@ -55,33 +61,48 @@ def main():
                 if event.key == pygame.K_RETURN:
                     insideSong = True
                     pygame.mixer.music.stop()
+                    import Play
                     Play.play(freeplayText[abs(chosenSong)][0])
+                    return 0
                 if event.key == pygame.K_SPACE and currentPlaying != freeplayText[abs(chosenSong)][0]:
                     currentPlaying = freeplayText[abs(chosenSong)][0]
                     jsonBabyCry = open(f"assets/data/{s}/{s.lower()}.json", 'r')
                     jsonBabyCry = jsonBabyCry.read()
                     jsonBabyCry = json.loads(jsonBabyCry)
                     bpm = jsonBabyCry['song']['bpm']
+                    curBeat = 1
                     pygame.mixer.music.stop() 
                     pygame.mixer.music.load(f"assets/songs/{s}/Inst.ogg")
                     pygame.mixer.music.play()
+                    currentIcon = chosenSong
                     print(bpm)
                 if event.key == pygame.K_BACKSPACE:
                     import Main
-                    freeplay = False
+                    return 0
+                
+        if currentPlaying != "":
+            timeNow = curSec+time.time()
+            if timeNow > (60/bpm)*curBeat:
+                curBeat += 1
+                beatPower = 35
+
         if not insideSong:
             screen.blit(menuBG, (0, 0))
             for i in range(len(freeplayText)):
                 if -i == chosenSong:
                     hahaFunny = freeplayText[i][1].render(freeplayText[i][0], True, (255, 255, 255))
+                    beatPower = beatPower/1.2
                 else:
                     hahaFunny = freeplayText[i][1].render(freeplayText[i][0], True, (127, 127, 127))
                 screen.blit(hahaFunny, (200+(25*(i+chosenSong)), 280+(100*(i+chosenSong))))
                 screen.blit(freeplayText[i][2], (50+(25*(i+chosenSong)), 275+(100*(i+chosenSong))), (0, 0, 150, 150))
+
         if not pygame.mixer.music.get_busy():
             currentPlaying = ""
+            currentIcon = None
             pygame.mixer.music.load("assets/music/freakyMenu.ogg")
             pygame.mixer.music.play()
+
         FPS.tick()
         pygame.display.flip()
         clock.tick(60)
