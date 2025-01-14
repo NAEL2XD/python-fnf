@@ -31,7 +31,10 @@ def main():
     useSaveSettings = True
     choice = 0
 
-    save = open('assets/saves/save.txt', 'r+')
+    a = 'assets/saves/save.txt'
+    if not checkFileExists(a):
+        save = open(a, 'w')
+    else: save = open(a, 'r')
     save = save.read()
     save = save.splitlines()
     for i in range(len(coolOptions)):
@@ -84,13 +87,13 @@ def main():
                         save[abs(choice)] = not save[abs(choice)]
                     playSound("scrollMenu")
                 if event.key == pygame.K_BACKSPACE:
-                    if checkFileExists('assets/saves/save.txt'):
-                        deleteFile('assets/saves/save.txt')
+                    if checkFileExists(a):
+                        deleteFile(a)
                     file = ""
                     for i in range(len(save)):
                         if coolOptions[i][1] == "BOOL":
                             file += f"{1 if save[i] else 0}\n"
-                    garbage = open('assets/saves/save.txt', 'w')
+                    garbage = open(a, 'w')
                     garbage.write(file)
                     garbage.close()
                     print("Save file created in assets/saves/save.txt")
