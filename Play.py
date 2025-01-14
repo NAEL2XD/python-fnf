@@ -1,10 +1,11 @@
 import pygame
+import FPS
+from Debugger import debugPrint
 from json import loads
 from time import time
 from decimal import Decimal
 from random import randint
 from os.path import exists as checkFileExists
-import FPS
 
 def checkForKey(key, notes, time):
     for i in range(len(notes)):
@@ -108,8 +109,8 @@ def play(jsonFile):
         cpuControlled = True if save[0] == "1" else False
         ghostTap = True if save[1] == "1" else False
     except:
-        if not checkFileExists('assets/saves/save.txt'): print('SAVE FILE NOT FOUND: assets/saves/save.txt')
-        else: print('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
+        if not checkFileExists('assets/saves/save.txt'): debugPrint('SAVE FILE NOT FOUND: assets/saves/save.txt')
+        else: debugPrint('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
         cpuControlled = False
         ghostTap = False
 
@@ -119,7 +120,7 @@ def play(jsonFile):
         lmao = pygame.mixer.Sound(voices)
         pygame.mixer.Sound.play(lmao)
     except:
-        print(f'SOUND NOT FOUND: {voices}')
+        debugPrint(f'SOUND NOT FOUND: {voices}')
     pygame.mixer.music.play()
 
     noteLoaded = 0

@@ -4,6 +4,7 @@ from json import loads
 from os.path import exists
 from time import time
 import FPS
+from Debugger import debugPrint
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -69,7 +70,7 @@ def main():
                     pygame.mixer.music.stop() 
                     pygame.mixer.music.load(f"assets/songs/{s}/Inst.ogg")
                     pygame.mixer.music.play()
-                    print(bpm)
+                    debugPrint(bpm)
                 if event.key == pygame.K_BACKSPACE:
                     import Main
                     return 0
