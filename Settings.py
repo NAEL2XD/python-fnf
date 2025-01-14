@@ -1,6 +1,8 @@
 import pygame
 import FPS
-import os, os.path
+from os.path import exists as checkFileExists
+from os import remove as deleteFile
+import time
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -10,9 +12,6 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((1280,720))
     clock = pygame.time.Clock()
-    save = open('assets/saves/save.txt', 'w+')
-    save = save.read()
-    save = save.splitlines()
 
     coolOptions = [
         [
@@ -20,17 +19,28 @@ def main():
             "BOOL",
             "Cheat if you want, i don't care tho.",
             False
+        ],
+        [
+            "Ghost Tapping",
+            "BOOL",
+            "If you wanna press without getting misses, this is for you.",
+            False
         ]
     ]
     textMaker = []
     useSaveSettings = True
     choice = 0
 
+    save = open('assets/saves/save.txt', 'r+')
+    save = save.read()
+    save = save.splitlines()
     for i in range(len(coolOptions)):
         textMaker.append([])
         try:
-            if save[i]:
-                uselessPieceOfShitSoItDoesntCrash = 0
+            if save[i] == "0":
+                save[i] = False
+            elif save[i] == "1":
+                save[i] = True
         except IndexError:
             save.append(coolOptions[i][3])
             useSaveSettings = False
@@ -44,6 +54,11 @@ def main():
     menuBGMagenta = pygame.image.load('assets/image/menuBGMagenta.png')
     pygame.mixer.music.load('assets/music/settings.ogg')
     pygame.mixer.music.play(-1)
+
+    bpm = 99.1
+    curBeat = 1
+    zoomForce = 0
+    timeOld = -time.time()
 
     while True:
         screen.fill('black')
@@ -69,8 +84,8 @@ def main():
                         save[abs(choice)] = not save[abs(choice)]
                     playSound("scrollMenu")
                 if event.key == pygame.K_BACKSPACE:
-                    if os.path.exists('assets/saves/save.txt'):
-                        os.remove('assets/saves/save.txt')
+                    if checkFileExists('assets/saves/save.txt'):
+                        deleteFile('assets/saves/save.txt')
                     file = ""
                     for i in range(len(save)):
                         if coolOptions[i][1] == "BOOL":
@@ -90,7 +105,15 @@ def main():
                 if -i == choice:
                     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(40, 610, 1200, 90))
                     cool = desc.render(coolOptions[i][2], True, (255, 255, 255))
-                    screen.blit(cool, (640-(len(coolOptions[i][2])*10), 640))
+                    screen.blit(cool, (640-(len(coolOptions[i][2])*9), 640))
+
+        timeNow = timeOld+time.time()
+        if timeNow > (60/bpm)*curBeat:
+            curBeat += 1
+            zoomForce = 40
+        zoomed_screen = pygame.transform.smoothscale(screen, (1280+zoomForce, 720+(zoomForce/1.5)))
+        screen.blit(zoomed_screen, (-zoomForce/2, -zoomForce/3.33))
+        zoomForce = (zoomForce/1.125)
 
         FPS.tick()
         pygame.display.flip()

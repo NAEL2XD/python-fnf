@@ -1,5 +1,7 @@
 import pygame
 import FPS
+import Freeplay
+import Settings
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -38,10 +40,8 @@ def main():
                     py = abs(optionsChosen)
                     print(py)
                     if py == 0:
-                        import Freeplay
                         Freeplay.main()
                     elif py == 1:
-                        import Settings
                         Settings.main()
             
         if not pygame.mixer.music.get_busy():

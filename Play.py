@@ -1,8 +1,9 @@
 import pygame
-import json
-import time
-import decimal
-import random
+from json import loads
+from time import time
+from decimal import Decimal
+from random import randint
+from os.path import exists as checkFileExists
 import FPS
 
 def checkForKey(key, notes, time):
@@ -19,15 +20,13 @@ def recalcAcc(acc, hit):
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
     pygame.mixer.Sound.play(lmao)
-
+    
 def play(jsonFile):
     pygame.init()
     screen = pygame.display.set_mode((1280,720))
     clock = pygame.time.Clock()
     width, height = pygame.display.get_window_size()
-
-    keybinds = [["a", 'LEFT'], ["s", 'DOWN'], ["w", 'UP'], ["d", 'RIGHT']]
-
+    
     stupidPath = 'assets/image/noteSkin/'
     noteAssets = [
         [pygame.image.load(f'{stupidPath}arrow.png'), 0],
@@ -40,6 +39,7 @@ def play(jsonFile):
         [pygame.image.load(f'{stupidPath}arrow.png')]
     ]
     noteDirs = ['Left', 'Down', 'Up', 'Right']
+
     for i in range(len(noteAssets)):
         nData = i
         if nData < 4:
@@ -55,7 +55,7 @@ def play(jsonFile):
     jsonFile = f"assets/data/{jsonFile}/{jsonFile.lower()}"
     jsonFile = open(f"{jsonFile}.json", "r")
     jsonFile = jsonFile.read()
-    jsonFile = json.loads(jsonFile)
+    jsonFile = loads(jsonFile)
     loaded = []
     notes = []
     for i in range(len(jsonFile['song']['notes'])):
@@ -67,7 +67,7 @@ def play(jsonFile):
                 if k == 0 or k == 2:
                     if k == 0:
                         v = v/1000
-                    v = decimal.Decimal(v)
+                    v = Decimal(v)
                     dec = abs(v.as_tuple().exponent)
                     if dec > 5:
                         v = "{:.5f}".format(round(v, 5))
@@ -87,6 +87,32 @@ def play(jsonFile):
     scrollSpeed = jsonFile['song']['speed']
     scoreTxt = pygame.font.Font("assets/fonts/vcr.ttf", 24)
 
+    # Playstate
+    score = 0
+    combo = 0
+    playerNoteRem = 0
+    accuracyOld = 0
+    accuracyNew = "???"
+    keybinds = [["a", 'LEFT'], ["s", 'DOWN'], ["w", 'UP'], ["d", 'RIGHT']]
+
+    # Game Funnies
+    zoomForce = 0
+    curSection = 1
+    bpm = jsonFile['song']['bpm']
+
+    # Saves Only
+    try:
+        save = open('assets/saves/save.txt', 'r')
+        save = save.read()
+        save = save.splitlines()
+        cpuControlled = True if save[0] == "1" else False
+        ghostTap = True if save[1] == "1" else False
+    except:
+        if not checkFileExists('assets/saves/save.txt'): print('SAVE FILE NOT FOUND: assets/saves/save.txt')
+        else: print('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
+        cpuControlled = False
+        ghostTap = False
+
     # Music
     pygame.mixer.music.load(song)
     try:
@@ -96,36 +122,18 @@ def play(jsonFile):
         print(f'SOUND NOT FOUND: {voices}')
     pygame.mixer.music.play()
 
-    # Playstate
-    score = 0
-    combo = 0
-    playerNoteRem = 0
-    accuracyOld = 0
-    accuracyNew = "???"
-
-    # Game Funnies
-    zoomForce = 0
-    curSection = 0
-    bpm = jsonFile['song']['bpm']
-
-    # Saves Only
-    save = open('assets/saves/save.txt', 'r')
-    save = save.read()
-    save = save.splitlines()
-
-    try:
-        cpuControlled = True if save[0] == "1" else False
-    except:
-        cpuControlled = False
-
     noteLoaded = 0
     spawnedNotes = []
     noMoreSpawn = False
-    songTime = -time.time()
+    songTime = -time()
     ratingSpawn = []
+    
     while True:
         screen.fill((0, 0, 0))
-        timeNow = (songTime+time.time())
+        timeNow = (songTime+time())
+        if timeNow > (240/bpm)*curSection:
+            curSection += 1
+            zoomForce = 100
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -163,7 +171,7 @@ def play(jsonFile):
                                 ratingSpawn.append([
                                     pygame.image.load(f'assets/image/{lolW[whatSpawn]}.png'),
                                     [520, 400],
-                                    [random.randint(-50, 50), -random.randint(300, 400), random.randint(100, 150)],
+                                    [randint(-50, 50), -randint(300, 400), randint(100, 150)],
                                     255,
                                     len(comboStr),
                                     []
@@ -173,24 +181,24 @@ def play(jsonFile):
                                     ratingSpawn[length][5].append([
                                         pygame.image.load(f'assets/image/num{comboStr[i]}.png'),
                                         [500+(60*i), 540],
-                                        [random.randint(-50, 50), -random.randint(300, 400), random.randint(100, 150)],
+                                        [randint(-50, 50), -randint(300, 400), randint(100, 150)],
                                         255
                                     ])
                                     ratingSpawn[length][5][i][0] = pygame.transform.scale(ratingSpawn[length][5][i][0], (55, 70))
-                            else:
+                            elif not ghostTap:
                                 combo = 0
                                 playerNoteRem += 1
                                 accuracyNew = recalcAcc(accuracyOld, playerNoteRem)
-                                playSound(f'missnote{random.randint(1, 3)}')
+                                playSound(f'missnote{randint(1, 3)}')
 
         if cpuControlled:
             for i in range(4):
                 thingyMaBob = checkForKey(i, spawnedNotes, timeNow)
-                if thingyMaBob[0] and thingyMaBob[2] < 22.5:
+                if thingyMaBob[0] and thingyMaBob[2] < 0:
                     spawnedNotes.pop(thingyMaBob[1])
                     lolW = ['sick', 'good', 'bad', 'shit']
                     whatSpawn = 0
-                    m = abs(thingyMaBob[2]+22.5)
+                    m = abs(thingyMaBob[2])
                     combo += 1
                     playerNoteRem += 1 
                     if m < 45:
@@ -213,7 +221,7 @@ def play(jsonFile):
                     ratingSpawn.append([
                         pygame.image.load(f'assets/image/{lolW[whatSpawn]}.png'),
                         [520, 400],
-                        [random.randint(-50, 50), -random.randint(300, 400), random.randint(100, 150)],
+                        [randint(-50, 50), -randint(300, 400), randint(100, 150)],
                         255,
                         len(comboStr),
                         []
@@ -223,7 +231,7 @@ def play(jsonFile):
                         ratingSpawn[length][5].append([
                             pygame.image.load(f'assets/image/num{comboStr[i]}.png'),
                             [500+(60*i), 540],
-                            [random.randint(-50, 50), -random.randint(300, 400), random.randint(100, 150)],
+                            [randint(-50, 50), -randint(300, 400), randint(100, 150)],
                             255
                         ])
                         ratingSpawn[length][5][i][0] = pygame.transform.scale(ratingSpawn[length][5][i][0], (55, 70))
@@ -242,7 +250,7 @@ def play(jsonFile):
 
         noteLoad = -1
         for i in range(len(ratingSpawn)):
-            if i > 3:
+            if i > 2:
                 ratingSpawn.pop(0)
             else:
                 noteLoad += 1
@@ -277,7 +285,7 @@ def play(jsonFile):
         for i in range(len(spawnedNotes)):
             noteLoad += 1
             try:
-                y = (((spawnedNotes[noteLoad][1]*750)-(timeNow*750))+50)*(scrollSpeed/2)
+                y = (((spawnedNotes[noteLoad][1]*750)-(timeNow*750))+50)*(scrollSpeed/2)-50
                 if y < 832:
                     if spawnedNotes[noteLoad][2] < 4:
                         x = (spawnedNotes[noteLoad][2]*112)+92
@@ -291,30 +299,25 @@ def play(jsonFile):
                         combo = 0
                         playerNoteRem += 1
                         accuracyNew = recalcAcc(accuracyOld, playerNoteRem)
-                        playSound(f'missnote{random.randint(1, 3)}')
+                        playSound(f'missnote{randint(1, 3)}')
                     elif y < 50 and spawnedNotes[noteLoad][2] < 4:
                         spawnedNotes.pop(noteLoad)
                         noteLoad -= 1
             except:
                 noteLoad -= 1
 
-        if timeNow > (240/bpm)*curSection:
-            curSection += 1
-            zoomForce = 90
+        if not pygame.mixer.music.get_busy():
+            import Freeplay
+            Freeplay.main()
+            break
 
         stxt = f'Score: {score} | Accuracy: {accuracyNew}' if not cpuControlled else 'BOT'
         sset = scoreTxt.render(stxt, True, (255, 255, 255))
         screen.blit(sset, ((width/2)-((len(stxt)*12)/2),600))
-
-        if not pygame.mixer.music.get_busy():
-            import Freeplay
-            Freeplay.main()
-            return 0
         
         zoomed_screen = pygame.transform.smoothscale(screen, (1280+zoomForce, 720+(zoomForce/1.5)))
-        screen.blit(zoomed_screen, (-(zoomForce/2), -(zoomForce/3.33)))
-        zoomForce = (zoomForce/1.075)
-
+        screen.blit(zoomed_screen, (-zoomForce/2, -zoomForce/3.33))
+        zoomForce = (zoomForce/1.125)
         FPS.tick()
         pygame.display.flip()
         clock.tick(60)
