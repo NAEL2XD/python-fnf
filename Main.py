@@ -1,7 +1,7 @@
 import pygame
 import Freeplay
 import Settings
-from Debugger import debugPrint, tick
+from Debugger import debug, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -15,6 +15,8 @@ def main():
     clock = pygame.time.Clock()
     menuBG = pygame.image.load('assets/image/menuBG.png')
     version = pygame.font.Font('assets/fonts/vcr.ttf', 20)
+    pygame.display.set_caption(f'Python FNF (v{pyVersion})')
+    pygame.display.set_icon(pygame.image.load('assets/icon.ico'))
 
     options = [
         ['Freeplay', pygame.font.Font('assets/fonts/vcr.ttf', 80)],
@@ -41,7 +43,7 @@ def main():
                         optionsChosen = 0
                 if event.key == pygame.K_RETURN:
                     py = abs(optionsChosen)
-                    debugPrint(py)
+                    debug(py)
                     if py == 0:
                         Freeplay.main()
                     elif py == 1:

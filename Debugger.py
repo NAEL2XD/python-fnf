@@ -3,6 +3,8 @@ import os
 import pygame
 import psutil
 
+# The debug function is also ai generated
+
 pygame.init()
 screen = pygame.display.set_mode((1280,720))
 clock = pygame.time.Clock()
@@ -27,7 +29,7 @@ def tick():
     pygame.display.flip()
     clock.tick(60)
 
-def debugPrint(*args, **kwargs):
+def debug(*args, **kwargs):
     frame = inspect.currentframe().f_back
     filename = frame.f_code.co_filename
     filename_only = os.path.basename(filename)

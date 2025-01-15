@@ -3,7 +3,7 @@ from glob import glob
 from json import loads
 from os.path import exists
 from time import time
-from Debugger import debugPrint, tick
+from Debugger import debug, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -42,7 +42,7 @@ def main():
                 pygame.quit()
                 raise SystemExit
             elif event.type == pygame.KEYDOWN:
-                s = freeplayText[abs(chosenSong)][0]
+                s = freeplayText[abs(chosenSong)][0].lower().replace(' ', '-')
                 if event.key == pygame.K_UP:
                     playSound("scrollMenu")
                     chosenSong += 1
@@ -61,7 +61,7 @@ def main():
                     return 0
                 if event.key == pygame.K_SPACE and currentPlaying != freeplayText[abs(chosenSong)][0]:
                     currentPlaying = freeplayText[abs(chosenSong)][0]
-                    jsonBabyCry = open(f"assets/data/{s}/{s.lower()}.json", 'r')
+                    jsonBabyCry = open(f"assets/data/{s}/{s}.json", 'r')
                     jsonBabyCry = jsonBabyCry.read()
                     jsonBabyCry = loads(jsonBabyCry)
                     bpm = jsonBabyCry['song']['bpm']
@@ -69,14 +69,14 @@ def main():
                     pygame.mixer.music.stop() 
                     pygame.mixer.music.load(f"assets/songs/{s}/Inst.ogg")
                     pygame.mixer.music.play()
-                    debugPrint(bpm)
+                    debug(bpm)
                 if event.key == pygame.K_BACKSPACE:
                     import Main
                     return 0
                 
         if currentPlaying != "":
             timeNow = curSec+time()
-            if timeNow > (60/bpm)*curBeat:
+            while timeNow > (60/bpm)*curBeat:
                 curBeat += 1
                 beatPower = 40
         else: beatPower = 0

@@ -1,6 +1,6 @@
 import pygame
 import xml.etree.ElementTree as ET
-from Debugger import debugPrint, tick
+from Debugger import debug, tick
 from json import loads
 from time import time
 from decimal import Decimal
@@ -93,6 +93,7 @@ def play(jsonFile):
         noteFrame[i] = NoteSkin(x=112*(i+1)+(0 if i < 4 else 147)+35, y=100, animation_name=f"arrow{noteDirs[i if i < 4 else i-4].upper()}")
 
     # Json LOL
+    jsonFile = jsonFile.lower().replace(' ', '-')
     song = f"assets/songs/{jsonFile}/Inst.ogg"
     voices = f"assets/songs/{jsonFile}/Voices.ogg"
     jsonFile = f"assets/data/{jsonFile}/{jsonFile.lower()}"
@@ -124,8 +125,7 @@ def play(jsonFile):
                     v = int(noteData)
                 add.append(v)
             notes.append(add)
-    debugPrint(f"{len(notes)} notes and {len(jsonFile['song']['notes'])} sections loaded.")
-    notes.append([0, 1, 0])
+    debug(f"{len(notes)} notes and {len(jsonFile['song']['notes'])} sections loaded.")
 
     # Default JSON Values and Text
     scrollSpeed = jsonFile['song']['speed']
@@ -153,8 +153,8 @@ def play(jsonFile):
         ghostTap = True if save[1] == "1" else False
         missSfx = True if save[2] == "1" else False
     except:
-        if not checkFileExists('assets/saves/save.txt'): debugPrint('SAVE FILE NOT FOUND: assets/saves/save.txt')
-        else: debugPrint('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
+        if not checkFileExists('assets/saves/save.txt'): debug('SAVE FILE NOT FOUND: assets/saves/save.txt')
+        else: debug('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
         cpuControlled = False
         ghostTap = False
         missSfx = True
@@ -165,7 +165,7 @@ def play(jsonFile):
         lmao = pygame.mixer.Sound(voices)
         pygame.mixer.Sound.play(lmao)
     except:
-        debugPrint(f'SOUND NOT FOUND: {voices}')
+        debug(f'SOUND NOT FOUND: {voices}')
     pygame.mixer.music.play()
 
     noteLoaded = 0
@@ -177,7 +177,7 @@ def play(jsonFile):
     while True:
         screen.fill((0, 0, 0))
         timeNow = (songTime+time())
-        if timeNow > (240/bpm)*curSection:
+        while timeNow > (240/bpm)*curSection:
             curSection += 1
             zoomForce += 50
 
