@@ -24,8 +24,8 @@ def tick():
     f = fps2.render(f'RAM: {ram} MB | CPU: {cpu}%', True, (255, 255, 255))
     screen.blit(e, (0, 0))
     screen.blit(f, (0, 16))
-    pygame.display.flip()  # Refresh on-screen display
-    clock.tick(60)         # wait until next frame (at 60 FPS)
+    pygame.display.flip()
+    clock.tick(60)
 
 def debugPrint(*args, **kwargs):
     frame = inspect.currentframe().f_back
