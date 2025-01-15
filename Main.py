@@ -9,10 +9,13 @@ def playSound(sound):
     pygame.mixer.Sound.play(lmao)
 
 def main():
+    pyVersion = "0.0.1" # So i wouldn't set all the way down.
+
     pygame.init()
     screen = pygame.display.set_mode((1280,720))
     clock = pygame.time.Clock()
     menuBG = pygame.image.load('assets/image/menuBG.png')
+    version = pygame.font.Font('assets/fonts/vcr.ttf', 20)
 
     options = [
         ['Freeplay', pygame.font.Font('assets/fonts/vcr.ttf', 80)],
@@ -54,6 +57,9 @@ def main():
         for i in range(len(options)):
             piss = options[i][1].render(options[i][0], True, (255, 255, 255) if -i == optionsChosen else (50, 50, 50))
             screen.blit(piss, (75, 120+(80*i)))
+
+        bitch = version.render(f"Python FNF (v{pyVersion})", True, (0, 0, 0))
+        screen.blit(bitch, (10, 690))
 
         FPS.tick()
         pygame.display.flip()

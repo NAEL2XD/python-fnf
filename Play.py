@@ -1,11 +1,73 @@
 import pygame
 import FPS
+import xml.etree.ElementTree as ET
 from Debugger import debugPrint
 from json import loads
 from time import time
 from decimal import Decimal
 from random import randint
 from os.path import exists as checkFileExists
+
+# The TextureAtlas xml was infact AI generated since there was NO ONE that have make this before
+
+stupidPath = 'assets/image/noteSkin/'
+texture = pygame.image.load(f"{stupidPath}NOTE_assets.png")
+tree = ET.parse(f"{stupidPath}NOTE_assets.xml")
+root = tree.getroot()
+subtextures = {}
+
+pygame.init()
+screen = pygame.display.set_mode((1280,720))
+clock = pygame.time.Clock()
+width, height = pygame.display.get_window_size()
+
+for subtexture in root.findall(".//SubTexture"):
+    name = subtexture.get("name")
+    x = int(subtexture.get("x"))
+    y = int(subtexture.get("y"))
+    width = int(subtexture.get("width"))
+    height = int(subtexture.get("height"))
+    subtextures[name] = pygame.Rect(x, y, width, height)
+
+class NoteSkin:
+    def __init__(self, x, y, animation_name):
+        self.x = x
+        self.y = y
+        self.animation_name = animation_name
+        self.size = (112, 112)
+        self.frame_names = [name for name in subtextures if name.startswith(animation_name)]
+        
+        if not self.frame_names:
+            self.frame_names = [f"{animation_name} 0000"] if f"{animation_name} 0000" in subtextures else []
+        
+        self.current_frame = 0
+        self.last_frame_time = time()
+        self.update()
+
+
+    def update(self, frame_delay=1/24):
+        current_frame_name = self.frame_names[self.current_frame]
+        if "confirm" in current_frame_name:
+            self.size = (150, 150)
+        else:
+            self.size = (112, 112)
+
+        if time() - self.last_frame_time >= frame_delay:
+            if self.frame_names:
+                self.current_frame = (self.current_frame + 1) % len(self.frame_names)
+                self.last_frame_time = time()
+
+
+    def draw(self):
+        if self.frame_names:
+            subtexture_name = self.frame_names[self.current_frame]
+            if subtexture_name in subtextures:
+                subrect = subtextures[subtexture_name]
+                subtexture = texture.subsurface(subrect)
+                scaled_subtexture = pygame.transform.scale(subtexture, self.size)
+                adjusted_x = self.x + 2 if "confirm" in subtexture_name else self.x
+                scaled_rect = scaled_subtexture.get_rect(center=(adjusted_x, self.y))
+                screen.blit(scaled_subtexture, scaled_rect.topleft)
 
 def checkForKey(key, notes, time):
     for i in range(len(notes)):
@@ -23,32 +85,13 @@ def playSound(sound):
     pygame.mixer.Sound.play(lmao)
     
 def play(jsonFile):
-    pygame.init()
-    screen = pygame.display.set_mode((1280,720))
-    clock = pygame.time.Clock()
-    width, height = pygame.display.get_window_size()
-    
-    stupidPath = 'assets/image/noteSkin/'
-    noteAssets = [
-        [pygame.image.load(f'{stupidPath}arrow.png'), 0],
-        [pygame.image.load(f'{stupidPath}arrow.png'), 90],
-        [pygame.image.load(f'{stupidPath}arrow.png'), -90],
-        [pygame.image.load(f'{stupidPath}arrow.png'), 180],
-        [pygame.image.load(f'{stupidPath}arrow.png')],
-        [pygame.image.load(f'{stupidPath}arrow.png')],
-        [pygame.image.load(f'{stupidPath}arrow.png')],
-        [pygame.image.load(f'{stupidPath}arrow.png')]
-    ]
+    noteFrame = ["", "", "", "", "", "", "", ""]
     noteDirs = ['Left', 'Down', 'Up', 'Right']
+    noteCols = ['purple', 'blue', 'green', 'red']
+    noteBTN = [0, 0, 0, 0]
 
-    for i in range(len(noteAssets)):
-        nData = i
-        if nData < 4:
-            dirlol = nData
-        else:
-            dirlol = nData-4
-        noteAssets[i][0] = pygame.transform.scale(noteAssets[i][0], (112, 112))
-        noteAssets[i][0] = pygame.transform.rotate(noteAssets[i][0], noteAssets[dirlol][1])
+    for i in range(8):
+        noteFrame[i] = NoteSkin(x=112*(i+1)+(0 if i < 4 else 147)+35, y=100, animation_name=f"arrow{noteDirs[i if i < 4 else i-4].upper()}")
 
     # Json LOL
     song = f"assets/songs/{jsonFile}/Inst.ogg"
@@ -82,6 +125,7 @@ def play(jsonFile):
                     v = int(noteData)
                 add.append(v)
             notes.append(add)
+    debugPrint(f"{len(notes)} notes and {len(jsonFile['song']['notes'])} sections loaded.")
     notes.append([0, 1, 0])
 
     # Default JSON Values and Text
@@ -108,11 +152,13 @@ def play(jsonFile):
         save = save.splitlines()
         cpuControlled = True if save[0] == "1" else False
         ghostTap = True if save[1] == "1" else False
+        missSfx = True if save[2] == "1" else False
     except:
         if not checkFileExists('assets/saves/save.txt'): debugPrint('SAVE FILE NOT FOUND: assets/saves/save.txt')
         else: debugPrint('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
         cpuControlled = False
         ghostTap = False
+        missSfx = True
 
     # Music
     pygame.mixer.music.load(song)
@@ -134,7 +180,7 @@ def play(jsonFile):
         timeNow = (songTime+time())
         if timeNow > (240/bpm)*curSection:
             curSection += 1
-            zoomForce = 100
+            zoomForce += 50
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -146,6 +192,8 @@ def play(jsonFile):
                         if event.key == getattr(pygame, f"K_{keybinds[i][j]}") and not cpuControlled:
                             thingyMaBob = checkForKey(i, spawnedNotes, timeNow)
                             if thingyMaBob[0]:
+                                noteFrame[i+4] = NoteSkin(x=112*(i+5)+182, y=100, animation_name=f"{noteDirs[i].lower()} confirm")
+                                noteBTN[i] = timeNow+((1/24)*4)
                                 spawnedNotes.pop(thingyMaBob[1])
                                 lolW = ['sick', 'good', 'bad', 'shit']
                                 whatSpawn = 0
@@ -197,6 +245,8 @@ def play(jsonFile):
                 thingyMaBob = checkForKey(i, spawnedNotes, timeNow)
                 if thingyMaBob[0] and thingyMaBob[2] < 0:
                     spawnedNotes.pop(thingyMaBob[1])
+                    noteFrame[i+4] = NoteSkin(x=112*(i+5)+182, y=100, animation_name=f"{noteDirs[i].lower()} confirm")
+                    noteBTN[i] = timeNow+((1/24)*4)
                     lolW = ['sick', 'good', 'bad', 'shit']
                     whatSpawn = 0
                     m = abs(thingyMaBob[2])
@@ -238,20 +288,18 @@ def play(jsonFile):
                         ratingSpawn[length][5][i][0] = pygame.transform.scale(ratingSpawn[length][5][i][0], (55, 70))
 
         while timeNow+3 > notes[noteLoaded][0] and not noMoreSpawn:
-            noteDir = notes[noteLoaded][1]-4 if notes[noteLoaded][1] > 3 else notes[noteLoaded][1]
             spawnedNotes.append([
-                pygame.image.load(f'{stupidPath}/note{noteDirs[noteDir]}.png'),
+                "",
                 notes[noteLoaded][0],
                 notes[noteLoaded][1]
             ])
             noteLoaded += 1
-            spawnedNotes[len(spawnedNotes)-1][0] = pygame.transform.scale(spawnedNotes[len(spawnedNotes)-1][0], (112, 112))
             if noteLoaded+1 == len(notes):
                 noMoreSpawn = True
 
         noteLoad = -1
         for i in range(len(ratingSpawn)):
-            if i > 2:
+            if i > 4:
                 ratingSpawn.pop(0)
             else:
                 noteLoad += 1
@@ -276,11 +324,13 @@ def play(jsonFile):
                 except:
                     noteLoad -= 1
 
-        for i in range(len(noteAssets)):
+        for i in range(len(noteFrame)):
+            noteFrame[i].update()
+            noteFrame[i].draw()
             if i < 4:
-                screen.blit(noteAssets[i][0], ((i*112)+92, 50))
-            else:
-                screen.blit(noteAssets[i][0], ((i*112)+240, 50))
+                if noteBTN[i-4] < timeNow and noteBTN[i-4] != 0:
+                    noteFrame[i-4] = NoteSkin(x=112*(i+5)+182, y=100, animation_name=f"arrow{noteDirs[i-4].upper()}")
+                    noteBTN[i-4] = 0
 
         noteLoad = -1
         for i in range(len(spawnedNotes)):
@@ -288,19 +338,18 @@ def play(jsonFile):
             try:
                 y = (((spawnedNotes[noteLoad][1]*750)-(timeNow*750))+50)*(scrollSpeed/2)-50
                 if y < 832:
-                    if spawnedNotes[noteLoad][2] < 4:
-                        x = (spawnedNotes[noteLoad][2]*112)+92
-                        screen.blit(spawnedNotes[noteLoad][0], (x, y))
-                    else:
-                        x = (spawnedNotes[noteLoad][2]*112)+240
-                        screen.blit(spawnedNotes[noteLoad][0], (x, y))
+                    x = (spawnedNotes[noteLoad][2]*112)+(92 if spawnedNotes[noteLoad][2] < 4 else 240)
+                    nd = spawnedNotes[noteLoad][2]
+                    spawnedNotes[noteLoad][0] = NoteSkin(x=x+55, y=y+50, animation_name=f"{noteCols[nd if nd < 4 else nd-4]}0")
+                    spawnedNotes[noteLoad][0].update()
+                    spawnedNotes[noteLoad][0].draw()
                     if y < -112:
                         spawnedNotes.pop(noteLoad)
                         noteLoad -= 1
                         combo = 0
                         playerNoteRem += 1
                         accuracyNew = recalcAcc(accuracyOld, playerNoteRem)
-                        playSound(f'missnote{randint(1, 3)}')
+                        if missSfx: playSound(f'missnote{randint(1, 3)}')
                     elif y < 50 and spawnedNotes[noteLoad][2] < 4:
                         spawnedNotes.pop(noteLoad)
                         noteLoad -= 1
@@ -314,11 +363,11 @@ def play(jsonFile):
 
         stxt = f'Score: {score} | Accuracy: {accuracyNew}' if not cpuControlled else 'BOT'
         sset = scoreTxt.render(stxt, True, (255, 255, 255))
-        screen.blit(sset, ((width/2)-((len(stxt)*12)/2),600))
+        screen.blit(sset, ((width/2)-((len(stxt)*12)/2)+600,600))
         
         zoomed_screen = pygame.transform.smoothscale(screen, (1280+zoomForce, 720+(zoomForce/1.5)))
         screen.blit(zoomed_screen, (-zoomForce/2, -zoomForce/3.33))
-        zoomForce = (zoomForce/1.125)
+        zoomForce = (zoomForce/1.08)
         FPS.tick()
         pygame.display.flip()
         clock.tick(60)

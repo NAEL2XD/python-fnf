@@ -26,7 +26,13 @@ def main():
             "BOOL",
             "If you wanna press without getting misses, this is for you.",
             False
-        ]
+        ],
+        [
+            "Note Misses",
+            "BOOL",
+            "Whetever you want to disable hearing the miss sfx.",
+            False
+        ],
     ]
     textMaker = []
     useSaveSettings = True
@@ -40,6 +46,7 @@ def main():
         save = open(a, 'r')
         save = save.read()
         save = save.splitlines()
+        debugPrint(save)
     for i in range(len(coolOptions)):
         textMaker.append([])
         try:
