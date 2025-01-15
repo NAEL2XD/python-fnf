@@ -1,7 +1,6 @@
 import pygame
-import FPS
 import xml.etree.ElementTree as ET
-from Debugger import debugPrint
+from Debugger import debugPrint, tick
 from json import loads
 from time import time
 from decimal import Decimal
@@ -368,6 +367,6 @@ def play(jsonFile):
         zoomed_screen = pygame.transform.smoothscale(screen, (1280+zoomForce, 720+(zoomForce/1.5)))
         screen.blit(zoomed_screen, (-zoomForce/2, -zoomForce/3.33))
         zoomForce = (zoomForce/1.08)
-        FPS.tick()
+        tick()
         pygame.display.flip()
         clock.tick(60)

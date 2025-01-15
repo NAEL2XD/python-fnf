@@ -3,8 +3,7 @@ from glob import glob
 from json import loads
 from os.path import exists
 from time import time
-import FPS
-from Debugger import debugPrint
+from Debugger import debugPrint, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -98,6 +97,6 @@ def main():
             pygame.mixer.music.load("assets/music/freakyMenu.ogg")
             pygame.mixer.music.play()
 
-        FPS.tick()
+        tick()
         pygame.display.flip()
         clock.tick(60)

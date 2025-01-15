@@ -1,9 +1,8 @@
 import pygame
-import FPS
 from os.path import exists as checkFileExists
 from os import remove as deleteFile
 import time
-from Debugger import debugPrint
+from Debugger import debugPrint, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -128,6 +127,6 @@ def main():
         screen.blit(zoomed_screen, (-zoomForce/2, -zoomForce/3.33))
         zoomForce = (zoomForce/1.125)
 
-        FPS.tick()
+        tick()
         pygame.display.flip()
         clock.tick(60)

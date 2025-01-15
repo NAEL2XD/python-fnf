@@ -1,8 +1,7 @@
 import pygame
-import FPS
 import Freeplay
 import Settings
-from Debugger import debugPrint
+from Debugger import debugPrint, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -61,7 +60,7 @@ def main():
         bitch = version.render(f"Python FNF (v{pyVersion})", True, (0, 0, 0))
         screen.blit(bitch, (10, 690))
 
-        FPS.tick()
+        tick()
         pygame.display.flip()
         clock.tick(60)
 
