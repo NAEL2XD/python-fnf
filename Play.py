@@ -1,6 +1,7 @@
 import pygame
 import xml.etree.ElementTree as ET
-from Debugger import debug, tick
+import Freeplay
+from Debugger import trace, tick, getHSContents
 from json import loads
 from time import time
 from decimal import Decimal
@@ -9,9 +10,9 @@ from os.path import exists as checkFileExists
 
 # The TextureAtlas xml was infact AI generated since there was NO ONE that have make this before
 
-stupidPath = 'assets/image/noteSkin/'
-texture = pygame.image.load(f"{stupidPath}NOTE_assets.png")
-tree = ET.parse(f"{stupidPath}NOTE_assets.xml")
+nspath = 'assets/image/noteSkin/'
+texture = pygame.image.load(f"{nspath}NOTE_assets.png")
+tree = ET.parse(f"{nspath}NOTE_assets.xml")
 root = tree.getroot()
 subtextures = {}
 
@@ -28,7 +29,7 @@ for subtexture in root.findall(".//SubTexture"):
     height = int(subtexture.get("height"))
     subtextures[name] = pygame.Rect(x, y, width, height)
 
-class NoteSkin:
+class NSTextureAtlas:
     def __init__(self, x, y, animation_name):
         self.x = x
         self.y = y
@@ -90,9 +91,10 @@ def play(jsonFile):
     noteBTN = [0, 0, 0, 0]
 
     for i in range(8):
-        noteFrame[i] = NoteSkin(x=112*(i+1)+(0 if i < 4 else 147)+35, y=100, animation_name=f"arrow{noteDirs[i if i < 4 else i-4].upper()}")
+        noteFrame[i] = NSTextureAtlas(x=112*(i+1)+(0 if i < 4 else 147)+35, y=100, animation_name=f"arrow{noteDirs[i if i < 4 else i-4].upper()}")
 
     # Json LOL
+    songName = jsonFile
     jsonFile = jsonFile.lower().replace(' ', '-')
     song = f"assets/songs/{jsonFile}/Inst.ogg"
     voices = f"assets/songs/{jsonFile}/Voices.ogg"
@@ -125,7 +127,8 @@ def play(jsonFile):
                     v = int(noteData)
                 add.append(v)
             notes.append(add)
-    debug(f"{len(notes)} notes and {len(jsonFile['song']['notes'])} sections loaded.")
+    notes.append([0, 1, 0])
+    trace(f"{len(notes)} notes and {len(jsonFile['song']['notes'])} sections loaded.")
 
     # Default JSON Values and Text
     scrollSpeed = jsonFile['song']['speed']
@@ -137,7 +140,7 @@ def play(jsonFile):
     playerNoteRem = 0
     accuracyOld = 0
     accuracyNew = "???"
-    keybinds = [["a", 'LEFT'], ["s", 'DOWN'], ["w", 'UP'], ["d", 'RIGHT']]
+    keybinds = [["q", 's'], ["d", 'f'], ["j", 'k'], ["l", 'm']]
 
     # Game Funnies
     zoomForce = 0
@@ -153,8 +156,8 @@ def play(jsonFile):
         ghostTap = True if save[1] == "1" else False
         missSfx = True if save[2] == "1" else False
     except:
-        if not checkFileExists('assets/saves/save.txt'): debug('SAVE FILE NOT FOUND: assets/saves/save.txt')
-        else: debug('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
+        if not checkFileExists('assets/saves/save.txt'): trace('SAVE FILE NOT FOUND: assets/saves/save.txt')
+        else: trace('SAVE FILE NOT UPDATED TO NEW OPTIONS VERSION.')
         cpuControlled = False
         ghostTap = False
         missSfx = True
@@ -165,7 +168,7 @@ def play(jsonFile):
         lmao = pygame.mixer.Sound(voices)
         pygame.mixer.Sound.play(lmao)
     except:
-        debug(f'SOUND NOT FOUND: {voices}')
+        trace(f'SOUND NOT FOUND: {voices}')
     pygame.mixer.music.play()
 
     noteLoaded = 0
@@ -191,12 +194,12 @@ def play(jsonFile):
                         if event.key == getattr(pygame, f"K_{keybinds[i][j]}") and not cpuControlled:
                             thingyMaBob = checkForKey(i, spawnedNotes, timeNow)
                             if thingyMaBob[0]:
-                                noteFrame[i+4] = NoteSkin(x=112*(i+5)+182, y=100, animation_name=f"{noteDirs[i].lower()} confirm")
+                                noteFrame[i+4] = NSTextureAtlas(x=112*(i+5)+182, y=100, animation_name=f"{noteDirs[i].lower()} confirm")
                                 noteBTN[i] = timeNow+((1/24)*4)
                                 spawnedNotes.pop(thingyMaBob[1])
                                 lolW = ['sick', 'good', 'bad', 'shit']
                                 whatSpawn = 0
-                                m = abs(thingyMaBob[2]+22.5)
+                                m = abs(thingyMaBob[2])
                                 combo += 1
                                 playerNoteRem += 1 
                                 if m < 45:
@@ -244,7 +247,7 @@ def play(jsonFile):
                 thingyMaBob = checkForKey(i, spawnedNotes, timeNow)
                 if thingyMaBob[0] and thingyMaBob[2] < 0:
                     spawnedNotes.pop(thingyMaBob[1])
-                    noteFrame[i+4] = NoteSkin(x=112*(i+5)+182, y=100, animation_name=f"{noteDirs[i].lower()} confirm")
+                    noteFrame[i+4] = NSTextureAtlas(x=112*(i+5)+182, y=100, animation_name=f"{noteDirs[i].lower()} confirm")
                     noteBTN[i] = timeNow+((1/24)*4)
                     lolW = ['sick', 'good', 'bad', 'shit']
                     whatSpawn = 0
@@ -328,7 +331,7 @@ def play(jsonFile):
             noteFrame[i].draw()
             if i < 4:
                 if noteBTN[i-4] < timeNow and noteBTN[i-4] != 0:
-                    noteFrame[i-4] = NoteSkin(x=112*(i+5)+182, y=100, animation_name=f"arrow{noteDirs[i-4].upper()}")
+                    noteFrame[i-4] = NSTextureAtlas(x=112*(i+5)+182, y=100, animation_name=f"arrow{noteDirs[i-4].upper()}")
                     noteBTN[i-4] = 0
 
         noteLoad = -1
@@ -339,13 +342,14 @@ def play(jsonFile):
                 if y < 832:
                     x = (spawnedNotes[noteLoad][2]*112)+(92 if spawnedNotes[noteLoad][2] < 4 else 240)
                     nd = spawnedNotes[noteLoad][2]
-                    spawnedNotes[noteLoad][0] = NoteSkin(x=x+55, y=y+50, animation_name=f"{noteCols[nd if nd < 4 else nd-4]}0")
+                    spawnedNotes[noteLoad][0] = NSTextureAtlas(x=x+55, y=y+50, animation_name=f"{noteCols[nd if nd < 4 else nd-4]}0")
                     spawnedNotes[noteLoad][0].update()
                     spawnedNotes[noteLoad][0].draw()
                     if y < -112:
                         spawnedNotes.pop(noteLoad)
                         noteLoad -= 1
                         combo = 0
+                        score -= 2
                         playerNoteRem += 1
                         accuracyNew = recalcAcc(accuracyOld, playerNoteRem)
                         if missSfx: playSound(f'missnote{randint(1, 3)}')
@@ -356,7 +360,24 @@ def play(jsonFile):
                 noteLoad -= 1
 
         if not pygame.mixer.music.get_busy():
-            import Freeplay
+            checks = getHSContents()
+            highScores = []
+            saveFile = ""
+            exists, where = False, 0
+            for i, table in enumerate(checks):
+                for key, value in table:
+                    highScores.append([key, value])
+                    if highScores[len(highScores)-1][0] == songName: exists, where = True, len(highScores)-1
+            if not cpuControlled:
+                if not exists:
+                    highScores.append([songName, score])
+                elif score > int(highScores[where][1]):
+                    highScores[where][1] = score
+            for i in range(len(highScores)):
+                saveFile += f"{highScores[i][0]}:{highScores[i][1]}\n"
+            new = open('assets/saves/highscore.txt', 'w')
+            new.write(saveFile)
+            new.close()
             Freeplay.main()
             break
 

@@ -29,7 +29,7 @@ def tick():
     pygame.display.flip()
     clock.tick(60)
 
-def debug(*args, **kwargs):
+def trace(*args):
     frame = inspect.currentframe().f_back
     filename = frame.f_code.co_filename
     filename_only = os.path.basename(filename)
@@ -39,3 +39,28 @@ def debug(*args, **kwargs):
     clickable_link = f"\033[90m\033]8;;{vscode_link}\033\\{filename_only}:{line_number}\033]8;;\033\\\033[0m"
     output = f"{' '.join(map(str, args))}".rstrip()
     print(f"{output:<{100}}{clickable_link}")
+
+def getHSContents():
+    try:
+        with open('assets/saves/highscore.txt', 'r') as file:
+            lines = file.readlines()
+
+        tables = []
+        cT = []
+
+        for line in lines:
+            line = line.strip()
+            if line:
+                key, value = line.split(':')
+                cT.append((key, value))
+            else:
+                tables.append(cT)
+                cT = []
+
+        if cT:
+            tables.append(cT)
+
+        return tables
+    except FileNotFoundError:
+        trace('FILE NOT FOUND: assets/saves/highscore.txt')
+        return []

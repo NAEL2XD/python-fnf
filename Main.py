@@ -1,7 +1,7 @@
 import pygame
 import Freeplay
 import Settings
-from Debugger import debug, tick
+from Debugger import trace, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -43,7 +43,7 @@ def main():
                         optionsChosen = 0
                 if event.key == pygame.K_RETURN:
                     py = abs(optionsChosen)
-                    debug(py)
+                    trace(py)
                     if py == 0:
                         Freeplay.main()
                     elif py == 1:

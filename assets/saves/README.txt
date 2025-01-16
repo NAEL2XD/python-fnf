@@ -1,0 +1,1 @@
+This is where PyFNF will store saves from, it is easy to edit but don't try to mess around, you might cause a crash from it.

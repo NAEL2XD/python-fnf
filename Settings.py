@@ -2,7 +2,7 @@ import pygame
 from os.path import exists as checkFileExists
 from os import remove as deleteFile
 import time
-from Debugger import debug, tick
+from Debugger import trace, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -40,12 +40,12 @@ def main():
     a = 'assets/saves/save.txt'
     if not checkFileExists(a):
         save = open(a, 'w')
-        debug(f'save file created at {a}')
+        trace(f'save file created at {a}')
     else:
         save = open(a, 'r')
         save = save.read()
         save = save.splitlines()
-        debug(save)
+        trace(save)
     for i in range(len(coolOptions)):
         textMaker.append([])
         try:
@@ -105,7 +105,7 @@ def main():
                     garbage = open(a, 'w')
                     garbage.write(file)
                     garbage.close()
-                    debug("Save file created in assets/saves/save.txt")
+                    trace("Save file created in assets/saves/save.txt")
                     pygame.mixer.music.stop()
                     import Main
                     return 0
