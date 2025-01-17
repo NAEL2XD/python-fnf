@@ -96,7 +96,7 @@ def main():
                     insideSong = True
                     pygame.mixer.music.stop()
                     import source.Play as Play
-                    Play.play(freeplayText[abs(chosenSong)][0])
+                    Play.play(s)
                     return 0
                 if event.key == pygame.K_SPACE and currentPlaying != freeplayText[abs(chosenSong)][0]:
                     currentPlaying = freeplayText[abs(chosenSong)][0]

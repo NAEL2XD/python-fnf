@@ -6,3 +6,4 @@ source/__pycache__/Main.cpython-310.pyc
 source/__pycache__/Play.cpython-310.pyc
 source/__pycache__/Settings.cpython-310.pyc
 export/
+build/
