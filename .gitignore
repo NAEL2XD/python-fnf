@@ -1,9 +1,4 @@
-assets/saves/save.txt
-assets/saves/highscore.txt
-source/__pycache__/Debugger.cpython-310.pyc
-source/__pycache__/Freeplay.cpython-310.pyc
-source/__pycache__/Main.cpython-310.pyc
-source/__pycache__/Play.cpython-310.pyc
-source/__pycache__/Settings.cpython-310.pyc
+assets/saves
+source/__pycache__
 export/
 build/

@@ -338,20 +338,20 @@ def play(jsonFile):
         for i in range(len(spawnedNotes)):
             noteLoad += 1
             try:
-                y = (((spawnedNotes[noteLoad][1]*750)-(timeNow*750)))*(scrollSpeed/2)
+                y = (((spawnedNotes[noteLoad][1]*750)-(timeNow*750)))*(scrollSpeed/2)+25
                 if y < 832:
                     x = (spawnedNotes[noteLoad][2]*112)+(92 if spawnedNotes[noteLoad][2] < 4 else 240)
                     nd = spawnedNotes[noteLoad][2]
                     spawnedNotes[noteLoad][0] = NSTextureAtlas(x=x+55, y=y+50, animation_name=f"{noteCols[nd if nd < 4 else nd-4]}0")
                     spawnedNotes[noteLoad][0].update()
                     spawnedNotes[noteLoad][0].draw()
-                    if y < -112:
+                    if y < -112 and spawnedNotes[noteLoad][2] > 3:
                         spawnedNotes.pop(noteLoad)
-                        noteLoad -= 1
                         combo = 0
-                        score -= 2
                         playerNoteRem += 1
+                        score -= 2
                         accuracyNew = recalcAcc(accuracyOld, playerNoteRem)
+                        noteLoad -= 1
                         if missSfx: playSound(f'missnote{randint(1, 3)}')
                     elif y < 50 and spawnedNotes[noteLoad][2] < 4:
                         spawnedNotes.pop(noteLoad)
