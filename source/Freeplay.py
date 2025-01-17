@@ -75,7 +75,7 @@ def main():
                 pygame.quit()
                 raise SystemExit
             if event.type == pygame.KEYDOWN:
-                s = freeplayText[abs(chosenSong)][0].lower().replace(' ', '-')
+                s = freeplayText[abs(chosenSong)][0].lower().replace(' ', '-').replace('.', '')
                 r = False
                 if event.key == pygame.K_UP:
                     playSound("scrollMenu")

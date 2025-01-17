@@ -338,7 +338,7 @@ def play(jsonFile):
         for i in range(len(spawnedNotes)):
             noteLoad += 1
             try:
-                y = (((spawnedNotes[noteLoad][1]*750)-(timeNow*750))+50)*(scrollSpeed/2)-50
+                y = (((spawnedNotes[noteLoad][1]*750)-(timeNow*750)))*(scrollSpeed/2)
                 if y < 832:
                     x = (spawnedNotes[noteLoad][2]*112)+(92 if spawnedNotes[noteLoad][2] < 4 else 240)
                     nd = spawnedNotes[noteLoad][2]
