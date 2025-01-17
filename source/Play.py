@@ -1,7 +1,7 @@
 import pygame
+import source.Freeplay as Freeplay
+from source.Debugger import trace, tick, getHSContents
 import xml.etree.ElementTree as ET
-import Freeplay
-from Debugger import trace, tick, getHSContents
 from json import loads
 from time import time
 from decimal import Decimal
@@ -177,7 +177,7 @@ def play(jsonFile):
     songTime = -time()
     ratingSpawn = []
     
-    while True:
+    while 1:
         screen.fill((0, 0, 0))
         timeNow = (songTime+time())
         while timeNow > (240/bpm)*curSection:
@@ -188,7 +188,7 @@ def play(jsonFile):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 raise SystemExit
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 for i in range(len(keybinds)):
                     for j in range(len(keybinds[i])):
                         if event.key == getattr(pygame, f"K_{keybinds[i][j]}") and not cpuControlled:

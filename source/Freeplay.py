@@ -3,7 +3,7 @@ from glob import glob
 from json import loads
 from os.path import exists
 from time import time
-from Debugger import trace, tick, getHSContents
+from source.Debugger import trace, tick, getHSContents
 
 class Icons:
     def __init__(self, image):
@@ -58,9 +58,8 @@ def main():
     curBeat = 0
     beatPower = 0
     beatIcon = 0
-    freeplay = True
     curSec = -time()
-    while freeplay:
+    while 1:
         def refreshHS():
             for i in range(len(highScores)):
                 if highScores[i][0] == freeplayText[abs(chosenSong)][0]:
@@ -75,7 +74,7 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 raise SystemExit
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 s = freeplayText[abs(chosenSong)][0].lower().replace(' ', '-')
                 r = False
                 if event.key == pygame.K_UP:
@@ -96,7 +95,7 @@ def main():
                 if event.key == pygame.K_RETURN:
                     insideSong = True
                     pygame.mixer.music.stop()
-                    import Play
+                    import source.Play as Play
                     Play.play(freeplayText[abs(chosenSong)][0])
                     return 0
                 if event.key == pygame.K_SPACE and currentPlaying != freeplayText[abs(chosenSong)][0]:
@@ -112,7 +111,7 @@ def main():
                     pygame.mixer.music.play()
                     trace(bpm)
                 if event.key == pygame.K_BACKSPACE:
-                    import Main
+                    import source.Main
                     return 0
                 
         if currentPlaying != "":
@@ -128,8 +127,8 @@ def main():
                 x, y, s = 50+(25*(i+chosenSong)), 275+(100*(i+chosenSong)), 150
                 if -i == beatIcon:
                     hi = freeplayText[i][2].scale(1+beatPower)
-                    x -= beatPower*40
-                    y -= beatPower*40
+                    x -= beatPower*75
+                    y -= beatPower*75
                 hahaFunny = freeplayText[i][1].render(freeplayText[i][0], True, (255, 255, 255) if -i == chosenSong else (50, 50, 50))
                 screen.blit(hahaFunny, (200+(25*(i+chosenSong)), 280+(100*(i+chosenSong))))
                 screen.blit(freeplayText[i][3] if -i != beatIcon else hi, (x, y), (0, 0, s, s))

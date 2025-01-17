@@ -2,7 +2,7 @@ import pygame
 from os.path import exists as checkFileExists
 from os import remove as deleteFile
 import time
-from Debugger import trace, tick
+from source.Debugger import trace, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -72,7 +72,7 @@ def main():
     zoomForce = 0
     timeOld = -time.time()
 
-    while True:
+    while 1:
         screen.fill('black')
         screen.blit(menuBGMagenta, (0, 0))
 
@@ -80,7 +80,7 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 raise SystemExit
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     playSound("scrollMenu")
                     choice += 1
@@ -107,7 +107,7 @@ def main():
                     garbage.close()
                     trace("Save file created in assets/saves/save.txt")
                     pygame.mixer.music.stop()
-                    import Main
+                    import source.Main
                     return 0
                 
         for i in range(len(textMaker)):

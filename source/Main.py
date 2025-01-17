@@ -1,7 +1,7 @@
 import pygame
-import Freeplay
-import Settings
-from Debugger import trace, tick
+import source.Freeplay as Freeplay
+import source.Settings as Settings
+from source.Debugger import trace, tick
 
 def playSound(sound):
     lmao = pygame.mixer.Sound(f"assets/sounds/{sound}.ogg")
@@ -24,7 +24,7 @@ def main():
     ]
     optionsChosen = 0
 
-    while True:
+    while 1:
         screen.fill("black")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
