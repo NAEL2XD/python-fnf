@@ -17,7 +17,7 @@ root = tree.getroot()
 subtextures = {}
 
 pygame.init()
-screen = pygame.display.set_mode((1280,720))
+screen = pygame.display.set_mode((1280,720), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 width, height = pygame.display.get_window_size()
 

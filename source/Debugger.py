@@ -6,7 +6,7 @@ import psutil
 # The debug function is also ai generated
 
 pygame.init()
-screen = pygame.display.set_mode((1280,720))
+screen = pygame.display.set_mode((1280,720), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 fps1 = pygame.font.Font('assets/fonts/vcr.ttf', 16)
 fps2 = pygame.font.Font('assets/fonts/vcr.ttf', 16)

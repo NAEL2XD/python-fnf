@@ -11,7 +11,7 @@ def main():
     pyVersion = "0.0.2" # So i wouldn't set all the way down.
 
     pygame.init()
-    screen = pygame.display.set_mode((1280,720))
+    screen = pygame.display.set_mode((1280,720), pygame.RESIZABLE)
     clock = pygame.time.Clock()
     menuBG = pygame.image.load('assets/image/menuBG.png')
     version = pygame.font.Font('assets/fonts/vcr.ttf', 20)
