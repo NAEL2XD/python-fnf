@@ -95,7 +95,7 @@ def play(jsonFile):
 
     # Json LOL
     songName = jsonFile
-    jsonFile = jsonFile.lower().replace(' ', '-')
+    jsonFile = jsonFile.lower().replace(' ', '-').replace('.', '')
     song = f"assets/songs/{jsonFile}/Inst.ogg"
     voices = f"assets/songs/{jsonFile}/Voices.ogg"
     jsonFile = f"assets/data/{jsonFile}/{jsonFile.lower()}"

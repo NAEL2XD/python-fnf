@@ -33,14 +33,15 @@ def main():
             False
         ],
     ]
+
+    save = []
     textMaker = []
     useSaveSettings = True
     choice = 0
-
     a = 'assets/saves/save.txt'
     if not checkFileExists(a):
-        save = open(a, 'w')
-        trace(f'save file created at {a}')
+        useSaveSettings = False
+        trace(f'Save file will be created at {a} when you exit settings.')
     else:
         save = open(a, 'r')
         save = save.read()
@@ -48,19 +49,16 @@ def main():
         trace(save)
     for i in range(len(coolOptions)):
         textMaker.append([])
-        try:
-            if save[i] == "0":
-                save[i] = False
-            elif save[i] == "1":
-                save[i] = True
-        except IndexError:
-            save.append(coolOptions[i][3])
-            useSaveSettings = False
+        if useSaveSettings:
+            try:
+                if coolOptions[i][1] == "BOOL": save[i] = False if save[i] == "0" else True
+            except IndexError:
+                useSaveSettings = False
         for j in range(2):
             textMaker[i].append(pygame.font.Font('assets/fonts/vcr.ttf', 40))
+            if not useSaveSettings: save.append(coolOptions[i][3])
     if useSaveSettings:
-        for i in range(len(coolOptions)):
-            coolOptions[i][3] = save[i]
+        for i in range(len(coolOptions)): coolOptions[i][3] = save[i]
 
     desc = pygame.font.Font('assets/fonts/vcr.ttf', 30)
     menuBGMagenta = pygame.image.load('assets/image/menuBGMagenta.png')
@@ -71,7 +69,6 @@ def main():
     curBeat = 1
     zoomForce = 0
     timeOld = -time.time()
-
     while 1:
         screen.fill('black')
         screen.blit(menuBGMagenta, (0, 0))
@@ -84,24 +81,19 @@ def main():
                 if event.key == pygame.K_UP:
                     playSound("scrollMenu")
                     choice += 1
-                    if choice == 1:
-                        choice = -len(coolOptions)+1
+                    if choice == 1: choice = -len(coolOptions)+1
                 if event.key == pygame.K_DOWN:
                     playSound("scrollMenu")
                     choice -= 1
-                    if choice == -len(coolOptions):
-                        choice = 0
+                    if choice == -len(coolOptions): choice = 0
                 if event.key == pygame.K_RETURN:
-                    if coolOptions[abs(choice)][1] == "BOOL":
-                        save[abs(choice)] = not save[abs(choice)]
+                    if coolOptions[abs(choice)][1] == "BOOL": save[abs(choice)] = not save[abs(choice)]
                     playSound("scrollMenu")
                 if event.key == pygame.K_BACKSPACE:
-                    if checkFileExists(a):
-                        deleteFile(a)
+                    if checkFileExists(a): deleteFile(a)
                     file = ""
-                    for i in range(len(save)):
-                        if coolOptions[i][1] == "BOOL":
-                            file += f"{1 if save[i] else 0}\n"
+                    for i in range(len(coolOptions)):
+                        if coolOptions[i][1] == "BOOL": file += f"{1 if save[i] else 0}\n"
                     garbage = open(a, 'w')
                     garbage.write(file)
                     garbage.close()

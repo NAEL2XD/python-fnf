@@ -8,7 +8,7 @@ def playSound(sound):
     pygame.mixer.Sound.play(lmao)
 
 def main():
-    pyVersion = "0.0.1" # So i wouldn't set all the way down.
+    pyVersion = "0.0.2" # So i wouldn't set all the way down.
 
     pygame.init()
     screen = pygame.display.set_mode((1280,720))
