@@ -7,7 +7,7 @@ Features:
 - JSON-based charts
 - Slightly user-friendly UI
 
-<small>This is not affiliated to ShadowMario or Denpa Engine, nor the Funkin' Crew Developers</small>
+<small>This is not affiliated with ShadowMario or Denpa Engine, nor the Funkin' Crew Developers</small>
 
 ## Compiling Python FNF
 
