@@ -4,6 +4,7 @@ import pygame
 import psutil
 
 # The debug function is also ai generated
+# dude make your own code :sob: - intel
 
 pygame.init()
 screen = pygame.display.set_mode((1280,720), pygame.RESIZABLE)
