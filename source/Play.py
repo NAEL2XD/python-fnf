@@ -69,11 +69,11 @@ class NSTextureAtlas:
                 scaled_rect = scaled_subtexture.get_rect(center=(adjusted_x, self.y))
                 screen.blit(scaled_subtexture, scaled_rect.topleft)
 
-def checkForKey(key, notes, time):
+def checkForKey(key, notes, time, bot=False):
     for i in range(len(notes)):
         if notes[i][2]-4 == key:
             ms = (notes[i][1]-time)*1000
-            if abs(ms) < 180:
+            if abs(ms) < 180 or bot:
                 return [True, i, ms]
     return [False]
 
@@ -244,8 +244,8 @@ def play(jsonFile):
 
         if cpuControlled:
             for i in range(4):
-                thingyMaBob = checkForKey(i, spawnedNotes, timeNow)
-                if thingyMaBob[0] and thingyMaBob[2] < 0:
+                thingyMaBob = checkForKey(i, spawnedNotes, timeNow, cpuControlled)
+                while thingyMaBob[0] and thingyMaBob[2] < 0:
                     spawnedNotes.pop(thingyMaBob[1])
                     noteFrame[i+4] = NSTextureAtlas(x=112*(i+5)+182, y=100, animation_name=f"{noteDirs[i].lower()} confirm")
                     noteBTN[i] = timeNow+((1/24)*4)
@@ -280,14 +280,15 @@ def play(jsonFile):
                         []
                     ])
                     length = len(ratingSpawn)-1
-                    for i in range(len(comboStr)):
+                    for ii in range(len(comboStr)):
                         ratingSpawn[length][5].append([
-                            pygame.image.load(f'assets/image/num{comboStr[i]}.png'),
-                            [500+(60*i), 540],
+                            pygame.image.load(f'assets/image/num{comboStr[ii]}.png'),
+                            [500+(60*ii), 540],
                             [randint(-50, 50), -randint(300, 400), randint(100, 150)],
                             255
                         ])
-                        ratingSpawn[length][5][i][0] = pygame.transform.scale(ratingSpawn[length][5][i][0], (55, 70))
+                        ratingSpawn[length][5][ii][0] = pygame.transform.scale(ratingSpawn[length][5][ii][0], (55, 70))
+                    thingyMaBob = checkForKey(i, spawnedNotes, timeNow, cpuControlled)
 
         while timeNow+3 > notes[noteLoaded][0] and not noMoreSpawn:
             spawnedNotes.append([
@@ -345,7 +346,7 @@ def play(jsonFile):
                     spawnedNotes[noteLoad][0] = NSTextureAtlas(x=x+55, y=y+50, animation_name=f"{noteCols[nd if nd < 4 else nd-4]}0")
                     spawnedNotes[noteLoad][0].update()
                     spawnedNotes[noteLoad][0].draw()
-                    if y < -112 and spawnedNotes[noteLoad][2] > 3:
+                    if y < -112 and (spawnedNotes[noteLoad][2] > 3 and not cpuControlled):
                         spawnedNotes.pop(noteLoad)
                         combo = 0
                         playerNoteRem += 1
