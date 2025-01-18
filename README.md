@@ -39,6 +39,7 @@ Follow these steps to compile Python FNF:
 > [!TIP]
 > If you want to test your changes without compiling, you can run:
 > `python Compile.py`
-> This allows you to preview your modifications before building the project.
+
+This allows you to preview your modifications before building the project.
 
 ## Thank you for using Python FNF! Feel free to contribute or report any issues
