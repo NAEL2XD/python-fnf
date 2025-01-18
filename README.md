@@ -1,5 +1,7 @@
 ## Python Friday Night Funkin' (improved README.md by Intel i3-10100F!)
 
+[![forthebadge](https://forthebadge.com/images/featured/featured-contains-cat-gifs.svg)](https://forthebadge.com)
+
 A Psych Engine Supported file structure for PYTHON.
 
 Features:
